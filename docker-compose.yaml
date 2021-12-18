@@ -1,0 +1,56 @@
+version: '3.5'
+
+networks:
+  dldb:
+  workstation:
+  farm:
+
+
+services:
+  # render farm
+  dldb:
+    image: mongo
+    networks:
+      - dldb
+
+  dlworker:
+    image: localhost:5000/dlworker
+    build:
+      context: ./
+      dockerfile: src/thinkbox/worker/Dockerfile
+    networks:
+      - farm
+      - dldb
+
+  dlserver:
+    image: localhost:5000/dlserver
+    environment:
+      MONGO: dldb
+      MONGO_PORT: "27017"
+    build:
+      context: ./
+      dockerfile: src/thinkbox/server/Dockerfile
+    networks:
+      - farm
+      - workstation
+      - dldb
+
+  polaris:
+    image: localhost:5000/polaris
+    networks:
+      - workstation
+    env_file:
+      - .env
+    build:
+      context: ./
+      dockerfile: src/polaris/Dockerfile
+
+  viewer:
+    image: dougw/novnc
+    networks:
+      - workstation
+    ports:
+      - "8081:8081"
+    environment:
+      REMOTE_HOST: "polaris"
+      REMOTE_PORT: "5901"

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deadline-workers
+  namespace: prod
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: deadline-workers
+
+  template:
+    metadata:
+      labels:
+        app: deadline-workers
+
+    spec:
+      containers:
+        - name: deadline-worker
+          image: localhost:5000/dlworker
+          imagePullPolicy: Always

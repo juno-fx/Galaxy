@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deadline-server
+  namespace: prod
+spec:
+  selector:
+    matchLabels:
+      app: deadline-server
+
+  template:
+    metadata:
+      labels:
+        app: deadline-server
+
+    spec:
+      containers:
+        - name: deadline-server
+          image: localhost:5000/dlserver
+          imagePullPolicy: Always
+          env:
+            - name: MONGO
+              value: "deadline-mongo"
+            - name: MONGO_PORT
+              value: "27017"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: prod
+  name: deadline-server
+spec:
+  selector:
+    app: deadline-server
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      name: deadline-server
