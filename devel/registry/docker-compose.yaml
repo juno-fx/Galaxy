@@ -1,0 +1,14 @@
+version: '3.2'
+
+networks:
+  kind:
+
+services:
+  registry:
+    container_name: kind-registry
+    image: registry:2
+    restart: "no"
+    networks:
+      - kind
+    ports:
+      - "5000:5000"

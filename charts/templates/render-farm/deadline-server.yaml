@@ -2,21 +2,23 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: deadline-server
-  namespace: prod
+  namespace: {{ .Values.namespace }}
 spec:
   selector:
     matchLabels:
       app: deadline-server
-
   template:
     metadata:
       labels:
         app: deadline-server
 
     spec:
+      nodeSelector:
+        services: "true"
+
       containers:
         - name: deadline-server
-          image: localhost:5000/dlserver
+          image: {{ .Values.farm.server_image }}
           imagePullPolicy: Always
           env:
             - name: MONGO
@@ -27,7 +29,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: prod
+  namespace: {{ .Values.namespace }}
   name: deadline-server
 spec:
   selector:

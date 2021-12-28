@@ -1,51 +1,59 @@
 version: '3.5'
 
 networks:
-  dldb:
+  db:
   workstation:
   farm:
 
-
 services:
+
   # render farm
-  dldb:
-    image: mongo
-    networks:
-      - dldb
-
-  dlworker:
-    image: localhost:5000/dlworker
-    build:
-      context: ./
-      dockerfile: src/thinkbox/worker/Dockerfile
-    networks:
-      - farm
-      - dldb
-
-  dlserver:
-    image: localhost:5000/dlserver
+  deadline-server:
+    hostname: server
+    image: localhost:5000/deadline-server
     environment:
-      MONGO: dldb
+      MONGO: deadline-db
       MONGO_PORT: "27017"
     build:
-      context: ./
-      dockerfile: src/thinkbox/server/Dockerfile
+      context: ./src
+      dockerfile: Dockerfile
+      target: server
     networks:
       - farm
       - workstation
-      - dldb
+      - db
 
+  deadline-worker:
+    image: localhost:5000/deadline-worker
+    hostname: worker
+    build:
+      context: ./src
+      dockerfile: Dockerfile
+      target: client
+    networks:
+      - farm
+      - db
+
+  deadline-db:
+    image: mongo
+    networks:
+      - db
+
+  # workstations
   polaris:
+    hostname: polaris
     image: localhost:5000/polaris
     networks:
       - workstation
     env_file:
       - .env
     build:
-      context: ./
-      dockerfile: src/polaris/Dockerfile
+      context: ./src
+      dockerfile: Dockerfile
+      target: workstation
 
   viewer:
+    hostname: novnc
     image: dougw/novnc
     networks:
       - workstation

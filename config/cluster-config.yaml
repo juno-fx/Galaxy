@@ -7,19 +7,24 @@ containerdConfigPatches:
     endpoint = ["http://kind-registry:5000"]
 nodes:
   - role: control-plane
+  - role: worker
     kubeadmConfigPatches:
-    - |
-      kind: InitConfiguration
-      nodeRegistration:
-        kubeletExtraArgs:
-          node-labels: "ingress-ready=true"
-    extraPortMappings:
-    - containerPort: 80
-      hostPort: 80
-      protocol: TCP
-    - containerPort: 443
-      hostPort: 443
-      protocol: TCP
-
+      - |
+        kind: JoinConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "services=true"
   - role: worker
+    kubeadmConfigPatches:
+      - |
+        kind: JoinConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "render=true"
   - role: worker
+    kubeadmConfigPatches:
+      - |
+        kind: JoinConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "workstation=true"

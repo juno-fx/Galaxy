@@ -2,3 +2,7 @@
 .idea
 *.run
 *.rpm
+content
+home
+pipeline
+.values.yaml

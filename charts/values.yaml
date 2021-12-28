@@ -1,0 +1,22 @@
+# Default values for juno-galaxy.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+namespace:
+
+farm:
+  server_image:
+  worker_image:
+
+workstations:
+  - name:
+    image:
+    password:
+    user:
+    sudo:
+
+mounts:
+  - server:
+    share:
+    mount:
+    name:

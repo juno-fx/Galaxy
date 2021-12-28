@@ -1,0 +1,76 @@
+{{range .Values.workstations}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Values.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .name }}
+
+  template:
+    metadata:
+      labels:
+        app: {{ .name }}
+
+    spec:
+      nodeSelector:
+        workstation: "true"
+
+      containers:
+        - name: {{ .name }}-viewer
+          image: dougw/novnc
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+              name: viewer
+          env:
+            - name: REMOTE_HOST
+              value: "localhost"
+            - name: REMOTE_PORT
+              value: "5901"
+
+        - name: {{ .name }}
+          image: {{ .image }}
+          imagePullPolicy: Always
+          env:
+            - name: USER
+              value: {{ .user }}
+            - name: PASSWORD
+              value: {{ .password }}
+            {{ if eq .sudo "true" }}
+            - name: SUDO
+              value: "true"
+            {{ end }}
+          volumeMounts:
+            {{range $.Values.mounts}}
+            - mountPath: {{ .mount }}
+              name: {{ .name }}
+            {{end}}
+
+      volumes:
+        {{range $.Values.mounts}}
+        - name: {{ .name }}
+          nfs:
+            server: {{ .server }}
+            path: {{ .share }}
+            readOnly: false
+        {{end}}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ $.Values.namespace }}
+  name: {{ .name }}
+spec:
+  selector:
+    app: {{ .name }}
+  ports:
+    - port: 8081
+      targetPort: 8081
+      protocol: TCP
+      name: vnc
+---
+{{end}}

@@ -1,11 +1,9 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   name: deadline-workers
-  namespace: prod
+  namespace: {{ .Values.namespace }}
 spec:
-  replicas: 1
-
   selector:
     matchLabels:
       app: deadline-workers
@@ -16,7 +14,10 @@ spec:
         app: deadline-workers
 
     spec:
+      nodeSelector:
+        render: "true"
+
       containers:
         - name: deadline-worker
-          image: localhost:5000/dlworker
+          image: {{ .Values.farm.worker_image }}
           imagePullPolicy: Always

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Exec=/juno/pipeline/applications/nuke/latest -nc
+Icon=/juno/pipeline/applications/nuke/Nuke13.1v1/plugins/icons/NukeApp256.png
+Terminal=true
+Categories=Polaris
+Name=Nuke Non Commercial
+GenericName=Compositor
+

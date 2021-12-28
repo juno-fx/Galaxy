@@ -1,9 +1,14 @@
-# Based on examples from the official AWS Thinkbox Deadline documentation
+# Bring in cached installers
+FROM localhost:5000/installers as installers
+
+# Basic workstation with deadline integration
 FROM junofx/polaris
 
-COPY src/thinkbox/DeadlineClient.run /tmp/thinkboxsetup/
+COPY --from=installers /thinkbox/DeadlineClient.run /tmp/thinkboxsetup/
 
-RUN /tmp/thinkboxsetup/DeadlineClient.run \
+RUN apt update && apt install  -y \
+      libxcb-xinput0 \
+    && /tmp/thinkboxsetup/DeadlineClient.run \
         --mode unattended \
         --unattendedmodeui minimal \
         --connectiontype Remote \
@@ -13,4 +18,5 @@ RUN /tmp/thinkboxsetup/DeadlineClient.run \
     && cp -Rv /opt/Thinkbox/Deadline10/*.desktop /usr/share/applications/ \
     && rm -rfv /tmp/*
 
-COPY src/polaris/deadline.ini /var/lib/Thinkbox/Deadline10/deadline.ini
+COPY polaris/*.desktop /usr/share/applications/
+COPY thinkbox/config/client.ini /var/lib/Thinkbox/Deadline10/deadline.ini
